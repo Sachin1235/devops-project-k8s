@@ -3,23 +3,18 @@ pipeline {
 
     environment {
         REGISTRY = "localhost:8083"
-        BACKEND_IMAGE = "backend:1"
-        FRONTEND_IMAGE = "frontend:1"
+        BACKEND_IMAGE = "industry-backend:1"
+        FRONTEND_IMAGE = "industry-frontend:1"
     }
 
     stages {
-
-        stage('Checkout Code') {
-            steps {
-                checkout scm
-            }
+        stage('Checkout') {
+            steps { checkout scm }
         }
 
         stage('Build Backend') {
             steps {
-                dir('backend') {
-                    sh './mvnw clean package'
-                }
+                sh 'cd backend && ./mvnw clean package'
             }
         }
 
@@ -30,15 +25,17 @@ pipeline {
             }
         }
 
-        stage('Login to Nexus Registry') {
+        stage('Login to Nexus') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'nexus-docker-creds', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+                withCredentials([usernamePassword(credentialsId: 'nexus-creds',
+                  usernameVariable: 'NEXUS_USER',
+                  passwordVariable: 'NEXUS_PASS')]) {
                     sh 'echo $NEXUS_PASS | docker login $REGISTRY -u $NEXUS_USER --password-stdin'
                 }
             }
         }
 
-        stage('Push Images to Nexus') {
+        stage('Push Images') {
             steps {
                 sh 'docker push $REGISTRY/$BACKEND_IMAGE'
                 sh 'docker push $REGISTRY/$FRONTEND_IMAGE'
