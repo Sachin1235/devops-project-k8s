@@ -17,9 +17,7 @@ pipeline {
 
         stage('Build Backend') {
             steps {
-                dir('backend') {
-                    sh 'mvn clean package'
-                }
+                sh './backend/mvnw clean package'
             }
         }
 
@@ -52,3 +50,4 @@ pipeline {
         }
     }
 }
+
