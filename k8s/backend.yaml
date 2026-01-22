@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: backend
-        image: nexus:8083/backend-app:latest
+        image: image: IMAGE_BACKEND
         ports:
         - containerPort: 8080
