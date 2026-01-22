@@ -1,12 +1,7 @@
 node {
 
-    stage('Show Workspace Files') {
-        sh '''
-          echo "=== Workspace Root ==="
-          ls -l
-          echo "=== Subfolders ==="
-          find . -maxdepth 2 -type d
-        '''
+    stage('Checkout') {
+        checkout scm
     }
 
     stage('Build Backend') {
