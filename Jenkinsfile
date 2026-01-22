@@ -11,6 +11,7 @@ pipeline {
 
         stage('Build Backend') {
             steps {
+                chmod +x backend/mvnw
                 sh './backend/mvnw clean package'
             }
         }
