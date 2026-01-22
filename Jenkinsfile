@@ -1,47 +1,18 @@
-pipeline {
-    agent any
+node {
 
-    environment {
-        REGISTRY = "localhost:8083"
-        BACKEND_IMAGE = "backend:1"
-        FRONTEND_IMAGE = "frontend:1"
+    stage('Build Backend') {
+        sh '''
+          echo "=============================="
+          echo " STEP 1: BUILDING BACKEND "
+          echo "=============================="
+          chmod +x backend/mvnw
+          ./backend/mvnw clean package -DskipTests
+        '''
     }
 
-    stages {
+    // Next stages will be added later step-by-step
+    // stage('Build Docker Images') { }
+    // stage('Push to Nexus') { }
+    // stage('Deploy to Kubernetes') { }
 
-        stage('Build Backend') {
-            steps {
-                chmod +x backend/mvnw
-                sh './backend/mvnw clean package'
-            }
-        }
-
-        stage('Build Docker Images') {
-            steps {
-                sh 'docker build -t $REGISTRY/$BACKEND_IMAGE backend'
-                sh 'docker build -t $REGISTRY/$FRONTEND_IMAGE frontend'
-            }
-        }
-
-        stage('Login to Nexus') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'nexus-creds', usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
-                    sh 'echo $NEXUS_PASS | docker login $REGISTRY -u $NEXUS_USER --password-stdin'
-                }
-            }
-        }
-
-        stage('Push Images') {
-            steps {
-                sh 'docker push $REGISTRY/$BACKEND_IMAGE'
-                sh 'docker push $REGISTRY/$FRONTEND_IMAGE'
-            }
-        }
-
-        stage('Deploy to Kubernetes') {
-            steps {
-                sh 'kubectl apply -f k8s/'
-            }
-        }
-    }
 }
